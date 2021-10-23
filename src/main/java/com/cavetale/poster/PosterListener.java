@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
@@ -27,6 +28,7 @@ public final class PosterListener implements Listener {
 
     @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
     protected void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) return;
         if (!(event.getRightClicked() instanceof ItemFrame)) return;
         ItemFrame itemFrame = (ItemFrame) event.getRightClicked();
         onClick(event.getPlayer(), itemFrame);
