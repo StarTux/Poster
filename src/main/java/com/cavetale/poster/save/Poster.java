@@ -21,10 +21,15 @@ public final class Poster {
     protected String imageFilename;
     protected List<Integer> mapIds;
     protected List<String> chat;
+    protected int width;
+    protected int height;
 
-    public Poster(final String name, final String theImageFileName, final List<Integer> mapIds) {
+    public Poster(final String name, final String theImageFileName, final List<Integer> mapIds,
+                  final int width, final int height) {
         this.name = name;
         this.imageFilename = theImageFileName;
         this.mapIds = mapIds;
+        this.width = width;
+        this.height = height;
     }
 }

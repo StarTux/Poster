@@ -75,12 +75,17 @@ public final class PosterPlugin extends JavaPlugin {
             getLogger().log(Level.SEVERE, "Reading image file: " + file, ioe);
             return false;
         }
-        int width = (image.getWidth() - 1) / 128 + 1;
-        int height = (image.getWidth() - 1) / 128 + 1;
+        if (poster.getWidth() == 0 || poster.getHeight() == 0) {
+            int width = (image.getWidth() - 1) / 128 + 1;
+            int height = (image.getWidth() - 1) / 128 + 1;
+            poster.setWidth(width);
+            poster.setHeight(height);
+            savePoster(poster);
+        }
         OUTER:
-        for (int y = 0; y < height; y += 1) {
-            for (int x = 0; x < width; x += 1) {
-                int index = x + y * width;
+        for (int y = 0; y < poster.getHeight(); y += 1) {
+            for (int x = 0; x < poster.getWidth(); x += 1) {
+                int index = x + y * poster.getWidth();
                 if (index >= poster.getMapIds().size()) {
                     getLogger().warning(poster.getName() + ": Map Id list too short!");
                     break OUTER;
@@ -135,12 +140,16 @@ public final class PosterPlugin extends JavaPlugin {
         }
         String name = imageFile.getName();
         name = name.substring(0, name.lastIndexOf(".")); // cut off suffix
-        Poster poster = new Poster(name, imageFile.getName(), mapIds);
-        File saveFile = new File(postersFolder, name + ".json");
+        Poster poster = new Poster(name, imageFile.getName(), mapIds, width, height);
         if (!enablePoster(poster)) return null;
-        Json.save(saveFile, poster, true);
+        savePoster(poster);
         posterList.add(poster);
         return poster;
+    }
+
+    protected void savePoster(Poster poster) {
+        File saveFile = new File(postersFolder, poster.getName() + ".json");
+        Json.save(saveFile, poster, true);
     }
 
     protected void unloadPosters() {
@@ -169,19 +178,24 @@ public final class PosterPlugin extends JavaPlugin {
         return null;
     }
 
+    public ItemStack createPosterMapItem(int mapId) {
+        ItemStack item = new ItemStack(Material.FILLED_MAP);
+        MapView mapView = Bukkit.getMap(mapId);
+        if (mapView == null) {
+            getLogger().warning("Map View not found: " + mapId);
+            return item;
+        }
+        item.editMeta(m -> {
+                MapMeta meta = (MapMeta) m;
+                meta.setScaling(false);
+                meta.setMapView(mapView);
+            });
+        return item;
+    }
+
     public void givePosterMaps(Player player, Poster poster) {
         for (int mapId : poster.getMapIds()) {
-            ItemStack item = new ItemStack(Material.FILLED_MAP);
-            MapView mapView = Bukkit.getMap(mapId);
-            if (mapView == null) {
-                getLogger().warning(poster.getName() + ": Map View not found: " + mapId);
-                continue;
-            }
-            item.editMeta(m -> {
-                    MapMeta meta = (MapMeta) m;
-                    meta.setScaling(false);
-                    meta.setMapView(mapView);
-                });
+            ItemStack item = createPosterMapItem(mapId);
             if (!player.getInventory().addItem(item).values().isEmpty()) {
                 getLogger().warning(poster.getName() + ": Player inventory is full!");
             }
