@@ -77,7 +77,7 @@ public final class PosterPlugin extends JavaPlugin {
         }
         if (poster.getWidth() == 0 || poster.getHeight() == 0) {
             int width = (image.getWidth() - 1) / 128 + 1;
-            int height = (image.getWidth() - 1) / 128 + 1;
+            int height = (image.getHeight() - 1) / 128 + 1;
             poster.setWidth(width);
             poster.setHeight(height);
             savePoster(poster);
@@ -129,7 +129,7 @@ public final class PosterPlugin extends JavaPlugin {
             return null;
         }
         int width = (image.getWidth() - 1) / 128 + 1;
-        int height = (image.getWidth() - 1) / 128 + 1;
+        int height = (image.getHeight() - 1) / 128 + 1;
         List<Integer> mapIds = new ArrayList<>();
         OUTER:
         for (int y = 0; y < height; y += 1) {
